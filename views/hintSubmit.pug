@@ -1,0 +1,31 @@
+extends layout 
+
+block content 
+    body
+        h2 Feel Free to Submit a Hint For an Existing Word
+
+        form(method="POST")
+            p 
+                |Word: 
+                input(name="word" value='')
+                br
+                |Hint for Existing Word: 
+                input(name="hint" value='')
+                br
+                input(type="submit" value="Send!")
+                input(type="reset" value="Clear!")
+        if msg 
+            h3 #{msg}
+        br
+
+//- block append footer 
+//-     a(href='/') Home 
+//-     |
+//-     |
+//-     a(href='/wordSubmit') Word Submission 
+//-     |
+//-     |
+//-     a(href='/hintSubmit') Hint Submission
+//-     |
+//-     |
+//-     a(href='/leaderboard') Leaderboard

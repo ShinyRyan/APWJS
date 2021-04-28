@@ -1,0 +1,23 @@
+doctype html
+html(lang="en")
+    head 
+        title="The Hangman Webserver"
+    body 
+        header
+            block homeLink 
+                if trusted 
+                    #home 
+                        a(href='/') Home 
+                    #leaderboard  
+                        a(href='/leaderboard') Leaderboards 
+                    #wordSubmit
+                        a(href='/wordSubmit') Word Submission 
+                    #hintSubmit
+                        a(href='/hintSubmit') Hint Submission 
+                    #logout 
+                        a(href='/logout') LogOut 
+        h1 Welcome To A Little Game of Hangman!
+
+    block content
+
+block footer
