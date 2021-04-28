@@ -1,0 +1,116 @@
+html, body{
+    color: white;
+    background-color: rgb(54, 54, 54);
+    width: 100%;
+    height: 100%;
+    margin:0;
+    padding: 0;
+}
+
+#bg-body{
+    position: absolute;
+    opacity: 0.2;
+    top: 17%;
+    left: 50%;
+    height: 225px;
+    width: 225px;
+    background-repeat: no-repeat;
+    background-size: 900px;
+}
+
+.sprite-win{ background:  url("../images/hangman.svg") 40px -9px;}
+.sprite-00{ background:  url("../images/hangman.svg") -150px -9px;}
+.sprite-01{ background:  url("../images/hangman.svg") -200px -9px;}
+.sprite-02{ background:  url("../images/hangman.svg") -440px -9px;}
+.sprite-03{ background:  url("../images/hangman.svg") -680px -9px;}
+.sprite-04{ background:  url("../images/hangman.svg") 40px -231px;}
+.sprite-05{ background:  url("../images/hangman.svg") -200px -231px;}
+.sprite-06{ background:  url("../images/hangman.svg") -440px -231px;}
+.sprite-07{ background:  url("../images/hangman.svg") -680px -231px;}
+.sprite-08{ background:  url("../images/hangman.svg") 40px -453px;}
+.sprite-09{ background:  url("../images/hangman.svg") -200px -453px;}
+.sprite-10{ background:  url("../images/hangman.svg") -440px -453px;}
+.sprite-11{ background:  url("../images/hangman.svg") -680px -453px;}
+.sprite-12{ background:  url("../images/hangman.svg") 40px -675px;}
+.sprite-13{ background:  url("../images/hangman.svg") -200px -675px;}
+.sprite-14{ background:  url("../images/hangman.svg") -440px -675px;}
+.sprite-15{ background:  url("../images/hangman.svg") -680px -675px;}
+
+.input-group{
+    width: 250px;
+}
+
+/* .input-group *{
+    border: 1px solid orange;
+} */
+
+#sparcing{
+    font-family: Consolas, monaco, monospace;
+    letter-spacing: 0.5em;
+}
+
+.close{
+    text-align: right;
+}
+
+.fails{ height:1.5em }
+
+#myModal{
+    background-color: rgb(66, 66, 66);
+    position: absolute;
+    z-index: 10;
+    min-width:50%;
+}
+
+.modal-bg{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 225px;
+    width: 225px;
+    background-position: right bottom;
+    background-repeat: no-repeat; 
+    opacity: 0.2;
+}
+
+.modal-win{
+    background:  url("../images/hangman.svg") -30px -09px;
+    background-size: 900px;
+}
+
+.modal-lose{
+    background:  url("../images/hangman.svg") -680px -675px;
+    background-size: 900px;
+}
+
+#myModal .modal-header{ border: 0; }
+
+.warn-floating{
+    margin: 10% 0;
+    padding: 0;
+    width:100%;
+    position: absolute;
+    opacity: 0.1;
+    font-size: 200px;
+}
+
+.form-control:focus{
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+@media (orientation: portrait) {
+    html, body{
+        font-size: 10px;
+    }
+
+    #bg-body{
+        left: 20%;
+    }
+    
+    #myModal{
+        margin: auto;
+        width: 90%;
+        height: 95%;
+    }
+}

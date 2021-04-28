@@ -1,0 +1,18 @@
+extends layout 
+block content 
+    if trusted 
+        h2 Welcome, #{trusted.name}
+    body.text-center
+    .cover-container.d-flex.h-100.p-3.mx-auto.flex-column
+      header.masthead.mb-auto
+        .inner
+          h1.masthead-brand.display-3 Hangman
+      main.inner.cover(role='main')
+        if error
+          .alert.alert-warning.alert-dismissible
+            a.close(href='/initial-word', data-dismiss='alert', aria-label='close') ×
+            strong Warning!
+            p(class="error") #{error}
+        a.btn.btn-lg.btn-secondary.align-bottom(href='/game') Start Game
+        
+block footer

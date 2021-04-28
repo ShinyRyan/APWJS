@@ -1,0 +1,38 @@
+extends layout 
+block content 
+    body
+        h2 Check the Leaderboards!
+
+        h3 Sort by:
+        form(method="post")
+            select(name="prop")
+                option(value="win_counter") Mightiest Winners
+                option(value="loss_counter") Biggest Losers
+                option(value="best_time") Fastest Time
+            br
+            input(type="submit" value="Sort!")
+
+            //finish leaderboard sort functions/queries
+            if results
+                h4 Displaying Leaderboard for #{results.prop}
+                -var count=1
+                each val in results.dataArr 
+                    if results.prop == "win_counter"
+                        p Placement #{count++} #{val._id} #{val.win_counter} wins
+                    if results.prop == "loss_counter"
+                        p Placement #{count++} #{val._id} #{val.loss_counter} losses
+                    if results.prop == "best_time"
+                        p Placement #{count++} #{val._id} #{val.best_time} seconds
+
+
+//- block append footer 
+//-     a(href='/') Home 
+//-     |
+//-     |
+//-     a(href='/wordSubmit') Word Submission 
+//-     |
+//-     |
+//-     a(href='/hintSubmit') Hint Submission
+//-     |
+//-     |
+//-     a(href='/leaderboard') Leaderboard

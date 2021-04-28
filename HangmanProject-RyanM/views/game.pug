@@ -1,0 +1,60 @@
+extends layout
+block content
+  body.text-center
+    if hangman.status() === 1
+      #bg-body(class=`sprite-win`)
+    else if hangman.status() === 2
+      #bg-body(class=`sprite-15`)
+    else
+      #bg-body(class=`sprite-${sprite}`)  
+    .cover-container.d-flex.h-100.p-3.mx-auto.flex-column
+      header.masthead.mb-auto
+        .inner
+          h1.masthead-brand.display-3 Hangman
+          h2 This is temporary. Just seeing if word is retrieved #{word}
+      main.inner.cover(role='main')
+        br
+        br
+        br
+        if error
+          #myModal.modal.modal-sm.modal-dialog.modal-error.modal-content(role='dialog')
+            .modal-header
+              a.close(href='/game', data-dismiss='modal') ×
+            br
+            h5 WARNING
+            .warn-floating
+              p ⚠
+            .d-flex.flex-column.justify-content-around.h-100 
+              h3 #{error}
+        else
+          if hangman.status() === 2
+            h1#sparcing.masthead-brand.display-6 #{hangman.hidden().join("").toUpperCase()}
+          else
+            h1#sparcing.masthead-brand.display-6 #{hangman.guessed().join("").toUpperCase()}
+          br
+          form(action='/try', method='POST')
+            .form-inline.input-group.mx-auto
+              input#desc.form-control.border-secondary(type='text', placeholder='Word or letter', name='text', autocomplete='off', autofocus='')
+              .input-group-append
+                input.btn.btn-outline-secondary(type='submit', value='Send!')
+          br
+          br
+          .fails #{hangman.fails()}
+          if hangman.status() === 1
+            #myModal.modal.modal-dialog.modal-content(role='dialog')
+              .modal-win.modal-bg
+              .modal-header
+                a.close(href='/', data-dismiss='modal') ×
+              h5 YOU WIN!!  
+              .d-flex.flex-column.justify-content-around.h-100
+                h1#sparcing.masthead-brand.display-6 #{hangman.guessed().join("").toUpperCase()}
+          if hangman.status() === 2
+            #myModal.modal.modal-dialog.modal-content(role='dialog')
+              .modal-lose.modal-bg
+              .modal-header
+                a.close(href='/', data-dismiss='modal') ×
+              .d-flex.flex-column.justify-content-around.h-100
+                h5.p-2 ...YOU LOSE...  
+                h4.p2#sparcing.masthead-brand.display-6 #{hangman.guessed().join("").toUpperCase()}
+                h1.p2#sparcing.masthead-brand.display-6 #{hangman.hidden().join("").toUpperCase()}
+                h6.p2 #{hangman.fails()}

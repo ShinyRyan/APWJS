@@ -1,0 +1,24 @@
+extends layout
+block content 
+
+    h3 Enter Login Information 
+    h4 If you don't have a login, please go to new user page!
+
+    form(method="POST")
+        |Name: 
+        |
+        input(name="userName")
+        br
+        |Password: 
+        input(name="pass")
+        br
+        br
+        input(type="submit" value="Login")
+    if msg 
+        h3 #{msg}
+    br
+    br
+    br
+
+block append footer
+    a(href='/createUser') New User Sign Up
