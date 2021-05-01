@@ -1,0 +1,36 @@
+{
+  "name": "hangmanappserver",
+  "version": "2.1.1",
+  "description": "Hangman Server",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShinyRyan/APWJS.git"
+  },
+  "keywords": [
+    "hangman",
+    "apwjs",
+    "game"
+  ],
+  "author": "Ryan McConnell, Kate Erkan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ShinyRyan/APWJS/issues"
+  },
+  "homepage": "https://github.com/ShinyRyan/APWJS#readme",
+  "dependencies": {
+    "bootstrap": "^4.6.0",
+    "crypto": "^1.0.1",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "jquery": "^3.6.0",
+    "mathjs": "^9.3.2",
+    "mongodb": "^3.6.6",
+    "mongoose": "^5.12.7",
+    "popper": "^1.0.1",
+    "pug": "^3.0.2"
+  }
+}

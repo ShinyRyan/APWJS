@@ -5,15 +5,19 @@ block content
     h4 If you have a login, please go to login page! 
 
     form(method="POST")
-        |Name: 
+        |Username: 
         |
         input(name="userName")
         br
         |Password: 
         input(name="pass")
         br
+        |Re-Enter Password: 
+        input(name="reenter")
+        br
         br
         input(type="submit" value="Sign up")
+        input(type="reset" value="Clear")
     if msg 
         h3 #{msg}
     br

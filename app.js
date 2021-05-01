@@ -47,44 +47,71 @@ async function isListAtMax(word){
 
 //Grab 1 random word from word list
 async function randWord(){
-    //let data=[];
     var wordInfo={};
     try{
         let cursor = await words.aggregate([{$match: {}}, {$sample: {size: 1}}])
-        await cursor.forEach((item)=>{
+            cursor.forEach((item)=>{
             wordInfo._id = item._id.toString();
             wordInfo.hintList = item.hintList;
             wordInfo.submittedBy = item.submittedBy;
-            //data.push(wordInfo);
-            //console.log(data);
             console.log(wordInfo._id);
             console.log(wordInfo)
         })
     }catch(e){
         console.log(e.message);
     }
-    return wordInfo._id;
+    return wordInfo;
+}
+
+//grab a hint for a word
+async function grabHints(hintID){
+    try{
+        var hintInfo = {};
+        let cursor = await hints.aggregate([{$match: {hint_id: hintID}}])
+        await cursor.forEach((item)=>{
+            hintInfo._id = item._id.toString();
+            hintInfo.hint_id = item.hint_id;
+            hintInfo.submittedBy = item.submittedBy;
+        })
+    }catch(e){
+        console.log(e.message);
+    }
+    return hintInfo
 }
 
 //FUNCTIONS TO UPDATE DB IF SOMEONE IS LOGGED IN
 //function to increment win or loss counter for current user at end of game
-var endgameStatus = true;
-function updateCounter(curUser, endgameStatus){
-    if (endgameStatus){ //if endgame status is true, they win
-        users.findOneAndUpdate({_id: curUser }, {$inc: { win_counter : 1}})
-    }else{ //if false then they lost
-        users.findOneAndUpdate({_id: curUser }, {$inc: { loss_counter : 1}})
+async function updateCounter(curUser, status){
+    console.log("status is " + status)
+    switch (status){
+        default:
+            console.log("check your code, bud")
+            break;
+        case (0): //if game is still playing
+            console.log("Game is currently being played by: " + curUser)
+            break;
+        case (1)://if game is won
+            await users.updateOne({_id: curUser.toString() }, {$inc: { win_counter : 1}})
+            console.log(curUser + " won")
+            break;
+        case (2): //if game is lost
+            await users.updateOne({_id: curUser.toString() }, {$inc: { loss_counter : 1}})
+            console.log(curUser + " lost")
+            break;
     }
 }
 //function to update best_time for logged in user
 //FIND A WAY TO TRACK TIME DURING GAME!!!
-function updateTime(curUser, timeTest){
-    //get best time from user db and convert to seconds
-    //then compare to time from the game they just finished
-    //if timeTest < current best_time, make timeTest the new best time for user
-    let result = users.findOne({_id : curUser});
-    if (timeTest < result.best_time){
-        users.findOneAndUpdate({_id: curUser}, {best_time : timeTest})
+async function updateTime(curUser, timeTest, status){
+    let userInfo = {};
+    let result = await users.findOne({_id : curUser});
+    result.forEach((item)=>{
+        userInfo._id = item._id.toString();
+        userInfo.best_time = item.best_time;
+    })
+    if (status == 1 && timeTest < userInfo.best_time){ //time only updates if won
+        console.log("game is won, updating user's new time: " + userInfo.best_time + " seconds")
+        //await users.updateOne({_id: curUser}, {$set: {best_time : timeTest}})
     }
 }
 
@@ -145,13 +172,12 @@ function moveOn(postData){
     postParams = qString.parse(postData);
     //handle empty data
     for (property in postParams){
-	if (postParams[property].toString().trim() == ''){
-	    proceed = false;
-	}
+	    if (postParams[property].toString().trim() == ''){
+	        proceed = false;
+	    }
     }
-
     return proceed;
-}
+}//Code originated from Prof Levy's lecture
 //handle views and dir
 app.set('views', './views');
 app.set('view engine', 'pug');
@@ -182,18 +208,18 @@ app.get('/login', function(req, res, next){
 	}
 });
 app.get('/logout', function(req, res){
-    if(req.session.user){
-        req.session.destroy();
-        res.render('login', {msg: "Successfully logged out! Bye-bye~"})
+    if(!req.session.user){
+        res.redirect('/login')
     } else{
-        res.render('login', {msg: "You got to log in to log out"})
+        req.session.destroy();
+        res.redirect('/login')
     }
 })
 app.get('/createUser', function(req, res, next){
     if(req.session.user){
         res.redirect('/');
     }else{
-        res.render('createUser', {trusted: req.session.user});
+        res.render('createUser');
     }
     
 })
@@ -219,45 +245,105 @@ app.get('/leaderboard', function(req, res, next){
     }
 });
 
-// by Kate Erkan 
-let hangman;
+// by Kate Erkan
+var hangman; 
+var gameStatus;
 let error;
 let sprites = [];
 let sprite = "";
-
+var startTime;
+var endTime;
+//by Ryan McConnell
+function setStatus(game){
+    if(game != undefined){
+        gameStatus = hangman.status();
+        console.log("gameStatus is " + gameStatus)
+    }
+    return gameStatus;
+}
+var hintData = []; //stores all hints for word of current game
+var stat;
 app.get('/game', async (req, res) => {
+    //console.log("first stat is " + stat)
+    switch(stat){
+        case(0):
+            console.log("game will continue")
+            break;
+        case(1):
+            console.log("will update user's win count")
+            await updateCounter(req.session.user.name, stat)
+            break;
+        case(2):
+            console.log("will update user's loss count")
+            await updateCounter(req.session.user.name, stat)
+            break;
+    } 
     const {  query : { error } } = req
     if(!req.session.user){
 		res.redirect('/login');
-	} else{
+	}else{
         if (hangman == undefined) {
             word = await randWord();
-            hangman = new Hangman(word)
+            console.log("this is hintlist: " + word.hintList)
+            var hintArr = word.hintList;
+            for(let i = 0; i < hintArr.length; i++){
+                //console.log("hint id is : " + hintArr[i]);
+                let hint = await grabHints(hintArr[i]);
+                hintData.push(hint._id)
+            }
+            console.log("data is: " + hintData)
+            hangman = new Hangman(word._id)
+            if(stat == undefined){
+                stat = setStatus(hangman)
+            }
             swattempts(hangman.attempts())
-            sprite = sprites[0]
         }
+        sprite = sprites[0]
         let i = sprites.length - 1 - hangman.attempts()
         sprite = sprites[i]
-        res.render('game', {trusted: req.session.user, word: word, error, hangman, sprite})
+        res.render('game', {trusted: req.session.user, word: word._id, results: hintData, error, hangman, sprite})
     }
-})// by Kate Erkan 
+})// by Kate Erkan, edited by Ryan
+
+//restart game without restarting app.js
+app.get('/restart', function(req, res){
+    stat = undefined;
+    hangman = undefined;
+    gameStatus = undefined;
+    hintData = [];
+    res.redirect('/game');
+})
+
+//game post routes
+app.post("/game", (req, res) => {
+    //const { body: { text } } = req
+    postData='';
+    req.on('data', (data)=> {
+        postData+=data;
+    })
+    req.on('end', async()=>{
+        console.log(postData);
+        if(!req.session.user){
+		    res.redirect('/login');
+	    } else{
+            if(moveOn(postData)){
+                try {
+                    console.log(postParams.text);
+                    hangman.try(postParams.text)
+                    stat = setStatus(hangman)
+                    //console.log("new stat is " + stat)
+                    res.redirect('/game', {trusted: req.session.user})
+                } catch (err) {
+                    res.status(500).render('error', {message: `That ain't good... \n ${err.message}`})
+                }
+            }else{
+                res.render('game', {trusted: req.session.user});
+            }
+        }
+    })
+})// by Kate Erkan & Ryan McConnell
 
 //POST ROUTES
-app.post("/try", (req, res) => {
-    const { body: { text } } = req
-    if(!req.session.user){
-		res.redirect('/login');
-	} else{
-        try {
-            hangman.try(text)
-        } catch ({ message }) {
-            res.redirect(`/game?error=${message}`)
-        }
-        res.redirect('/game', {trusted: req.session.user})
-    }
-    
-})// by Kate Erkan 
-
 var postData;
 var user;
 app.post('/login', express.urlencoded({extended: false}), async (req, res, next)=>{
@@ -276,7 +362,7 @@ app.post('/login', express.urlencoded({extended: false}), async (req, res, next)
 	    }catch (err){
 		    next(err)
 	    }
-})
+})//Code originated from Prof Levy's lecture
 app.post('/createUser', function(req, res){
     postData = '';
     req.on('data', (data) =>{
@@ -284,20 +370,27 @@ app.post('/createUser', function(req, res){
     });
     req.on('end', async ()=>{
 	    postParams = qString.parse(postData)
-        try{
-            //console.log(postParams.userName);
-            //console.log(postParams.pass); <-used to make sure it caught the right values
-            let curDoc = docifyUser(postParams);
-            await curDoc.save();
-            console.log("Added " + postParams.userName + " to db");
-            //below checks if they are now present in db and proceeds to log them in
-            let result = await users.findOne({_id: postParams.userName})
-            console.log(result);
-            let trusted={name: result._id.toString()};
-            req.session.user=trusted;
-            res.redirect('/')
-        }catch (err){
-            res.status(500).render('error', {message: `That ain't good... \n ${err.message}`})
+        let cursor = await users.find({_id: postParams.userName.toString()}).countDocuments()
+        if(postParams.pass.toString() != postParams.reenter.toString()){
+            res.render('createUser', {msg: "Please enter your password correctly"})
+        }else if(cursor > 0){
+            res.render('createUser', {msg: "That user already exists"})
+        }else{
+            try{
+                //console.log(postParams.userName);
+                //console.log(postParams.pass); <-used to make sure it caught the right values
+                let curDoc = docifyUser(postParams);
+                await curDoc.save();
+                console.log("Added " + postParams.userName + " to db");
+                //below checks if they are now present in db and proceeds to log them in
+                let result = await users.findOne({_id: postParams.userName})
+                console.log(result);
+                let trusted={name: result._id.toString()};
+                req.session.user=trusted;
+                res.redirect('/')
+            }catch (err){
+                res.status(500).render('error', {message: `That ain't good... \n ${err.message}`})
+            }
         }
     })
 })
@@ -375,7 +468,7 @@ app.post('/hintSubmit', function(req, res){
                 console.log(hintInput);
                 var hintID = getRand();
                 var atMax = await isListAtMax(wordInput);
-                console.log("Does the word at max number of hints? " + atMax);
+                console.log("Is the word at max number of hints? " + atMax);
                 var wordCheck = await words.find({_id : wordInput}).countDocuments()
                 var hintIDCheck = await hints.find({hint_id : hintID}).countDocuments()
                 var hintCheck = await hints.find({_id : hintInput}).countDocuments()
@@ -510,6 +603,8 @@ app.listen(7000, async()=>{
         console.log(e.message);
     }
     console.log("Server is running...");
+    startTime = new Date().toLocaleTimeString("en-US", {timeZone: "America/New_York"})
+    console.log("start time test " + startTime)
     //console.log(randWord()); //<- test for randWord was working correctly 
     //console.log(randWord());
     //console.log(randWord());

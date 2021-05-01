@@ -22,7 +22,7 @@ const Hangman = (function () {
 
             if (typeof this._attempts !== "number") throw Error("invalid attempts " + this._attempts)
 
-            if (this._attemps <= 0) throw Error("invalid number of attempts " + this._attempts)
+            if (this._attempts <= 0) throw Error("invalid number of attempts " + this._attempts)
 
             this._guessed = new Array(this._word.length).fill("_")
 
@@ -80,17 +80,17 @@ const Hangman = (function () {
          * @throws {Error} if param is not string or is an emplty one
          */
         try(text) {
-            if (typeof text !== "string") throw Error("invalid letter or word " + text)
+            if (typeof text !== "string") throw Error("invalid character or word " + text);
             
-            text = text.trim();
-
+            text = text.toLowerCase().trim();
             if (!text.length) throw Error("text cannot be empty or blank");
 
-            if (this._status === Hangman.CONTINUE && this._attempts > 0)
-                return text.length === 1 ? tryLetter(this, text) : tryWord(this, text)
-
-            return false;
-        }
+            if (this._status === Hangman.CONTINUE && this._attempts > 0){
+                return text.length === 1 ? tryLetter(this, text) : tryWord(this, text);
+            }else{
+                return false;
+            }
+        }//Edited by Ryan
 
         // Get the status of current game
          
