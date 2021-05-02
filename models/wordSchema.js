@@ -14,3 +14,4 @@ const wordSchema = new mongoose.Schema({
 const words=mongoose.model('Word', wordSchema, 'words');
 
 module.exports = words;
+//By Ryan McConnell

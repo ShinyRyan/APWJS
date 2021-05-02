@@ -26,13 +26,13 @@ const Hangman = require('./routes/game.js')
 //function for hashing passwords
 function genHash(input){
     return Buffer.from(crypto.createHash('sha256').update(input).digest('base32')).toString('hex').toUpperCase();
-}
+}//By Ryan McConnell
 
 //random function 
 function getRand(){
     var rand = Math.floor((Math.random() * 10000) + 1);
     return rand;
-}
+}//By Ryan McConnell
 
 //check if a word's hint list is full. Current check: hint list can't have more than 5
 async function isListAtMax(word){
@@ -43,7 +43,7 @@ async function isListAtMax(word){
         maxHints = true;
     }
     return maxHints;
-}
+}//By Ryan McConnell
 
 //Grab 1 random word from word list
 async function randWord(){
@@ -61,7 +61,7 @@ async function randWord(){
         console.log(e.message);
     }
     return wordInfo;
-}
+}//By Ryan McConnell
 
 //grab a hint for a word
 async function grabHints(hintID){
@@ -77,7 +77,7 @@ async function grabHints(hintID){
         console.log(e.message);
     }
     return hintInfo
-}
+}//By Ryan McConnell
 //restart game function
 function restart(){
     stat = undefined;
@@ -87,7 +87,7 @@ function restart(){
     startTime = undefined;
     endTime = undefined;
     totalTime = undefined;
-}
+}//By Ryan McConnell
 
 //FUNCTIONS TO UPDATE DB IF SOMEONE IS LOGGED IN
 //function to increment win or loss counter for current user at end of game
@@ -109,7 +109,7 @@ async function updateCounter(curUser, status){
             console.log(curUser + " lost")
             break;
     }
-}
+}//By Ryan McConnell
 //function to update best_time for logged in user
 //FIND A WAY TO TRACK TIME DURING GAME!!!
 async function updateTime(curUser, timeTest){
@@ -123,7 +123,17 @@ async function updateTime(curUser, timeTest){
         console.log("game is won, updating user's new time: " + timeTest + " seconds")
         await users.updateOne({_id: curUser}, {$set: {best_time : timeTest}})
     }
-}
+}//By Ryan McConnell
+
+//signup stuff
+let nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+	service: 'Gmail',
+	auth:{
+		user: 'hangmangame7000@gmail.com',
+		pass: 'qtqubdyqbiqotisf' //DO NOT DO THIS FOR A CLIENT. UNSECURED!!!
+	}
+});//based on Prof Levy's lecture
 
 //DOCIFY FUNCTIONS
 //docify function for word submission
@@ -132,19 +142,19 @@ function docifyWord(inputWord, hintID, user){
     let doc = new words({ _id: inputWord.toLowerCase(),
          hintList: [hintID], submittedBy: user });
     return doc;
-};
+};//By Ryan McConnell
 //docify function for new user info.
 function docifyUser(params){
-    let doc = new users({ _id: params.userName, password: genHash(params.pass)})
+    let doc = new users({ _id: params.userName, password: genHash(params.pass), email: params.email})
     return doc;
-};
+};//By Ryan McConnell
 //docify function for hint submission
 //user var should be req.session.user
 function docifyHint(inputHint, hintID, user){
     let doc = new hints({ _id: inputHint.toString(), hint_id: hintID,
          submittedBy: user});
     return doc;
-};
+};//By Ryan McConnell
 function swattempts(tries) {
     switch(tries){
         case 5: sprites =  ["00", "01", "06", "08", "10", "15"]
@@ -209,14 +219,23 @@ app.get('/', function (req, res){
         //<a href="/hintSubmit">   Hint Submission   </a></body></html>');
         res.render('index', {trusted: req.session.user})
     }
-}); 
+}); //By Ryan McConnell
 app.get('/login', function(req, res, next){
 	if(req.session.user){
 		res.redirect('/');
 	} else{
 		res.render('login');
 	}
-});
+});//By Ryan McConnell
+app.get('/login/:userID', async(req, res, next)=>{
+    try{
+		const results = await users.updateOne({_id: req.params.userID}, {email_verified: true})
+		res.redirect('/login');
+	}catch(err){
+		next(err)
+	}
+})//By Ryan McConnell
+
 app.get('/logout', function(req, res){
     if(!req.session.user){
         res.redirect('/login')
@@ -225,7 +244,7 @@ app.get('/logout', function(req, res){
         restart();
         res.redirect('/login')
     }
-})
+})//By Ryan McConnell
 app.get('/createUser', function(req, res, next){
     if(req.session.user){
         res.redirect('/');
@@ -233,28 +252,28 @@ app.get('/createUser', function(req, res, next){
         res.render('createUser');
     }
     
-})
+})//By Ryan McConnell
 app.get('/wordSubmit', function(req, res, next){
     if(!req.session.user){
 		res.redirect('/login');
 	} else{
         res.render('wordSubmit', {trusted: req.session.user});
     }
-});
+});//By Ryan McConnell
 app.get('/hintSubmit', function(req, res, next){
     if(!req.session.user){
 		res.redirect('/login');
 	} else{
         res.render('hintSubmit', {trusted: req.session.user});
     }
-});
+});//By Ryan McConnell
 app.get('/leaderboard', function(req, res, next){
     if(!req.session.user){
 		res.redirect('/login');
 	} else{
         res.render('leaderboard', {trusted: req.session.user});
     }
-});
+});//By Ryan McConnell
 
 // by Kate Erkan
 var hangman; 
@@ -272,7 +291,7 @@ function setStatus(game){
         console.log("gameStatus is " + gameStatus)
     }
     return gameStatus;
-}
+}//By Ryan McConnell
 var hintData = []; //stores all hints for word of current game
 var stat;
 app.get('/game', async (req, res) => {
@@ -328,7 +347,7 @@ app.get('/game', async (req, res) => {
 app.get('/restart', function(req, res){
     restart();
     res.redirect('/game');
-})
+})//By Ryan McConnell
 
 //game post routes
 app.post("/game", (req, res) => {
@@ -398,18 +417,34 @@ app.post('/createUser', function(req, res){
                 let curDoc = docifyUser(postParams);
                 await curDoc.save();
                 console.log("Added " + postParams.userName + " to db");
-                //below checks if they are now present in db and proceeds to log them in
-                let result = await users.findOne({_id: postParams.userName})
-                console.log(result);
-                let trusted={name: result._id.toString()};
-                req.session.user=trusted;
-                res.redirect('/')
+                let msgOpts={
+                    subject: "Welcome to the Hangman Server!",
+                    html: '<html><a href=\'http://localhost:7000/login/'+postParams.userName+'\'>Click to login to Hangman Server</a>',
+                    to: `${postParams.email}`,
+                    from: "hangmangame7000@gmail.com"
+                }
+                transporter.sendMail(msgOpts);
+                // //below checks if they are now present in db and proceeds to log them in
+                // let result = await users.findOne({_id: postParams.userName})
+                // console.log(result);
+                // let trusted={name: result._id.toString()};
+                // req.session.user=trusted;
+                res.redirect('/login')
             }catch (err){
                 res.status(500).render('error', {message: `That ain't good... \n ${err.message}`})
             }
         }
     })
-})
+})//By Ryan McConnell
+app.get('/signup/:userID', async(req, res, next)=>{
+	try{
+		const results = await users.updateOne({_id: req.params.userID}, {email_verified: true})
+		res.redirect('/login');
+	}catch(err){
+		next(err)
+	}
+})//from Prof Levy's lecture
+
 app.post('/wordSubmit', function(req, res){
     user = req.session.user.name; //<- returns only name string of current user
     //console.log(user);
@@ -466,7 +501,7 @@ app.post('/wordSubmit', function(req, res){
             res.render('wordSubmit', {trusted: req.session.user});
         }
     })
-})
+})//By Ryan McConnell
 app.post('/hintSubmit', function(req, res){
     user = req.session.user.name; //<- returns only name string of current user
     console.log(user);
@@ -549,7 +584,7 @@ app.post('/hintSubmit', function(req, res){
         }
         
     })
-})
+})//By Ryan McConnell
 //Insert leaderboard sort POST here. UPDATE: Yay its done
 app.post('/leaderboard', function(req, res){
     postData = '';
@@ -597,7 +632,7 @@ app.post('/leaderboard', function(req, res){
             res.render('leaderboard', {trusted: req.session.user});
         }
     })
-})
+})//By Ryan McConnell
 
 //error stuff
 app.use('*', function(req, res){
@@ -606,7 +641,7 @@ app.use('*', function(req, res){
 });
 app.use((err, req, res, next)=>{
 	res.status(500).render('error', {message: err.message})
-})
+})//Based on Prof Levy's lecture
 
 //Express listen function
 app.listen(7000, async()=>{
@@ -622,4 +657,4 @@ app.listen(7000, async()=>{
     //console.log(randWord()); //<- test for randWord was working correctly 
     //console.log(randWord());
     //console.log(randWord());
-} );
+} );//By Ryan McConnell

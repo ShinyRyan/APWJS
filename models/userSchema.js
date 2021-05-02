@@ -21,6 +21,14 @@ const userSchema = new mongoose.Schema({
     loss_counter: {
         type: Number,
         default: 0
+    },
+    email: {
+        type: String,
+        required: [true]
+    },
+    email_verified: {
+        type: Boolean,
+        default: false
     }
 });
 const users=mongoose.model('User', userSchema, 'user');
@@ -29,3 +37,4 @@ const users=mongoose.model('User', userSchema, 'user');
 //mongoose model couldn't find the a collection. wahoo... - Ryan
 
 module.exports = users;
+//By Ryan McConnell

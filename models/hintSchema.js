@@ -14,3 +14,4 @@ const hintSchema = new mongoose.Schema({
 const hints=mongoose.model('Hint', hintSchema, 'hints');
 
 module.exports = hints;
+//By Ryan McConnell
