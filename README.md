@@ -1,7 +1,7 @@
 MAKE SURE TO:
 cd into project
 run 'npm install' 
-
+ 
 run git clone https://github.com/ShinyRyan/APWJS and then
       mongorestore --nsInclude=HangmanDB for db access
 
