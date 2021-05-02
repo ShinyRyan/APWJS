@@ -54,8 +54,8 @@ async function randWord(){
             wordInfo._id = item._id.toString();
             wordInfo.hintList = item.hintList;
             wordInfo.submittedBy = item.submittedBy;
-            console.log(wordInfo._id);
-            console.log(wordInfo)
+            //console.log(wordInfo._id);
+            //console.log(wordInfo)
         })
     }catch(e){
         console.log(e.message);
@@ -77,6 +77,16 @@ async function grabHints(hintID){
         console.log(e.message);
     }
     return hintInfo
+}
+//restart game function
+function restart(){
+    stat = undefined;
+    hangman = undefined;
+    gameStatus = undefined;
+    hintData = [];
+    startTime = undefined;
+    endTime = undefined;
+    totalTime = undefined;
 }
 
 //FUNCTIONS TO UPDATE DB IF SOMEONE IS LOGGED IN
@@ -102,16 +112,16 @@ async function updateCounter(curUser, status){
 }
 //function to update best_time for logged in user
 //FIND A WAY TO TRACK TIME DURING GAME!!!
-async function updateTime(curUser, timeTest, status){
+async function updateTime(curUser, timeTest){
     let userInfo = {};
-    let result = await users.findOne({_id : curUser});
-    result.forEach((item)=>{
+    let cursor = await users.aggregate([{$match: {_id : curUser}}]);
+    cursor.forEach((item)=>{
         userInfo._id = item._id.toString();
         userInfo.best_time = item.best_time;
     })
-    if (status == 1 && timeTest < userInfo.best_time){ //time only updates if won
-        console.log("game is won, updating user's new time: " + userInfo.best_time + " seconds")
-        //await users.updateOne({_id: curUser}, {$set: {best_time : timeTest}})
+    if (timeTest < userInfo.best_time){ //time only updates if won
+        console.log("game is won, updating user's new time: " + timeTest + " seconds")
+        await users.updateOne({_id: curUser}, {$set: {best_time : timeTest}})
     }
 }
 
@@ -212,6 +222,7 @@ app.get('/logout', function(req, res){
         res.redirect('/login')
     } else{
         req.session.destroy();
+        restart();
         res.redirect('/login')
     }
 })
@@ -253,6 +264,7 @@ let sprites = [];
 let sprite = "";
 var startTime;
 var endTime;
+var totalTime;
 //by Ryan McConnell
 function setStatus(game){
     if(game != undefined){
@@ -270,7 +282,11 @@ app.get('/game', async (req, res) => {
             console.log("game will continue")
             break;
         case(1):
-            console.log("will update user's win count")
+            console.log("will update user's win count, and check time")
+            endTime = Date.now()/1000; //end time in seconds
+            totalTime = (endTime - startTime).toPrecision(6);
+            console.log("Your time is " + totalTime + "seconds");
+            await updateTime(req.session.user.name, totalTime);
             await updateCounter(req.session.user.name, stat)
             break;
         case(2):
@@ -284,7 +300,7 @@ app.get('/game', async (req, res) => {
 	}else{
         if (hangman == undefined) {
             word = await randWord();
-            console.log("this is hintlist: " + word.hintList)
+            //console.log("this is hintlist: " + word.hintList)
             var hintArr = word.hintList;
             for(let i = 0; i < hintArr.length; i++){
                 //console.log("hint id is : " + hintArr[i]);
@@ -297,20 +313,20 @@ app.get('/game', async (req, res) => {
                 stat = setStatus(hangman)
             }
             swattempts(hangman.attempts())
+            startTime = Date.now()/1000; //begin time in seconds
         }
         sprite = sprites[0]
         let i = sprites.length - 1 - hangman.attempts()
         sprite = sprites[i]
-        res.render('game', {trusted: req.session.user, word: word._id, results: hintData, error, hangman, sprite})
+            totalTime = (endTime - startTime).toPrecision(6);
+        res.render('game', {trusted: req.session.user, word: word._id, results: hintData,
+             time: totalTime, error, hangman, sprite})
     }
 })// by Kate Erkan, edited by Ryan
 
 //restart game without restarting app.js
 app.get('/restart', function(req, res){
-    stat = undefined;
-    hangman = undefined;
-    gameStatus = undefined;
-    hintData = [];
+    restart();
     res.redirect('/game');
 })
 
@@ -603,8 +619,6 @@ app.listen(7000, async()=>{
         console.log(e.message);
     }
     console.log("Server is running...");
-    startTime = new Date().toLocaleTimeString("en-US", {timeZone: "America/New_York"})
-    console.log("start time test " + startTime)
     //console.log(randWord()); //<- test for randWord was working correctly 
     //console.log(randWord());
     //console.log(randWord());

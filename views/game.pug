@@ -58,9 +58,12 @@ block content
                 h4.p2#sparcing.masthead-brand.display-6 How much you revealed: #{hangman.guessed().join("").toUpperCase()}
                 h1.p2#sparcing.masthead-brand.display-6 Your word was: #{hangman.hidden().join("").toUpperCase()}
                 h6.p2 #{hangman.fails()}
+    if (!isNaN(time))
+      h7 Your time is: #{time} seconds 
+      br
   body.text-center
     if results
-      h7 Hints for your word:
+      h8 Hints for your word:
       -var count=1 
       each val in results 
         p Hint #{count++}: #{val}
