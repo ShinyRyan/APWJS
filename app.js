@@ -363,7 +363,9 @@ app.post("/game", (req, res) => {
 	    } else{
             if(moveOn(postData)){
                 try {
-                    console.log(postParams.text);
+                    if(postParams.text === " " || postParams.text === null || postParams.text === undefined || hangman.status() === undefined){
+                        res.render('game', {trusted: req.session.user, msg: "Please do not have text be only whitespace or empty"})
+                    }
                     hangman.try(postParams.text)
                     stat = setStatus(hangman)
                     //console.log("new stat is " + stat)
