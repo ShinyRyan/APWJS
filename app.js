@@ -351,7 +351,7 @@ app.get('/game', async (req, res) => {
         res.render('game', {trusted: req.session.user, word: word._id, results: hintData,
              time: totalTime, error, hangman, sprite})
     }
-})// by Kate Erkan, edited by Ryan McConnell
+})// Started by Kate Erkan, Finished by Ryan McConnell
 
 //restart game without restarting app.js
 app.get('/restart', function(req, res){
@@ -390,7 +390,7 @@ app.post("/game", (req, res) => {
             }
         }
     })
-})// by Kate Erkan & Ryan McConnell
+})// Started by Kate Erkan & Finished by Ryan McConnell
 
 //POST ROUTES
 //post route variables
