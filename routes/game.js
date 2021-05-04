@@ -13,7 +13,7 @@ Description: Contains all class functions to run an instance of a Hangman game.
 //Creates and manage a Hangman class/game
 const Hangman = (function () {
     class Hangman {
-        constructor(word, attempts = 10) {
+        constructor(word, attempts = 6) {
             
             if (typeof word !== "string") throw Error("invalid word " + word)
 
