@@ -180,7 +180,7 @@ function swattempts(tries) {
         default: console.error("DEFAULT")
             break;
     }
-} //by Kate Erkan 
+} //by Kate Erkan, Code adapted from: https://github.com/MinaZhen/hangman 
 // Now back to Ryan :)
 
 //PAGES

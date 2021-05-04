@@ -1,3 +1,4 @@
+  /*Kate Erkan, Code adapted from: https://github.com/MinaZhen/hangman*/
 /**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
  * @version 1.14.3

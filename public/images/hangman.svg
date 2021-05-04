@@ -1,3 +1,4 @@
+  /*Kate Erkan, Code adapted from: https://github.com/MinaZhen/hangman*/
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
@@ -752,3 +753,5 @@
 		c0.24-0.829,1.556-1.175,2.94-0.775c1.384,0.4,2.312,1.396,2.072,2.225"/>
 </g>
 </svg>
+
+	

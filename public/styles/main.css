@@ -1,3 +1,4 @@
+  /*Kate Erkan, Code adapted from: https://github.com/MinaZhen/hangman*/
 html, body{
     color: white;
     background-color: rgb(54, 54, 54);
@@ -114,3 +115,4 @@ html, body{
         height: 95%;
     }
 }
+  

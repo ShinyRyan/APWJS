@@ -1,3 +1,4 @@
+  /*Kate Erkan, Code adapted from: https://github.com/MinaZhen/hangman*/
 /*!
   * Bootstrap v4.1.0 (https://getbootstrap.com/)
   * Copyright 2011-2018 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)

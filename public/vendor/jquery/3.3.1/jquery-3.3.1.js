@@ -1,3 +1,4 @@
+  /*Kate Erkan, Code adapted from: https://github.com/MinaZhen/hangman*/
 /*!
  * jQuery JavaScript Library v3.3.1
  * https://jquery.com/
