@@ -1,6 +1,9 @@
-// game.js
-// APW - Hangman Game
-// Kate Erkan - April 2021
+/* 
+game.js
+@author: Kate Erkan
+version: April 2021
+Description: Contains all class functions to run an instance of a Hangman game.
+*/ 
 
 "use strict";
 //const { forEach } = require('mathjs');

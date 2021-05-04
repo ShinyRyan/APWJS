@@ -1,3 +1,9 @@
+/*
+hintSchema.js
+@author: Ryan McConnell
+version: 05/03/2021
+*/
+
 let mongoose = require('mongoose');
 
 const hintSchema = new mongoose.Schema({

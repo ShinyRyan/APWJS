@@ -1,3 +1,9 @@
+/*
+userRoute.js
+@author: Ryan McConnell
+version: 05/03/2021
+Description: Router used for email verification in app.js
+*/
 var express = require("express");
 var router = express.Router();
 let users = require('../models/userSchema');
